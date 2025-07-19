@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farm Details</title>
+  <style>
+    /* --- Root Variables & Dark Mode (Copied from index.html for consistency) --- */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #16a085;
+      --header-bg: var(--primary-color);
+      --button-bg: #16a085;
+      --button-hover-bg: #13856d;
+      --border-radius: 15px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --card-bg: #f9f9f9;
+      --info-bg: #e9f5f2;
+      /* Added for consistency with index.html */
+      --shadow-light: rgba(0,0,0,0.1);
+      --shadow-medium: rgba(0,0,0,0.2);
+      --input-border: #ddd;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #eee;
+      --header-bg: #0e4d4d;
+      --button-bg: #0e4d4d;
+      --button-hover-bg: #084338;
+      --card-bg: #2c2c2c;
+      --info-bg: #194b47;
+      /* Added for consistency with index.html */
+      --shadow-light: rgba(255,255,255,0.08);
+      --shadow-medium: rgba(255,255,255,0.15);
+      --input-border: #666;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- Header (Copied EXACTLY from your index.html CSS) --- */
+    header {
+      height: 113px; /* Matched index.html */
+      overflow: hidden; /* Matched index.html */
+      background: var(--header-bg);
+      color: white;
+      padding: 1rem; /* Matched index.html */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-sizing: border-box; /* Matched index.html */
+      position: relative; /* Ensure z-index works if needed */
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100%; /* Matched index.html */
+    }
+    .logo img {
+      max-height: 130px; /* Changed from 55px to 75px */
+      width: auto;
+      display: block;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem; /* Matched index.html */
+    }
+    .lang-toggle {
+      background: #ffffff;
+      color: var(--primary-color);
+      font-weight: bold;
+      border: 2px solid var(--primary-color);
+      padding: 0.5rem 1rem; /* Matched index.html */
+      cursor: pointer;
+      border-radius: 20px;
+      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    .lang-toggle:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: white;
+    }
+    .mode-toggle {
+      background: transparent;
+      border: 2px solid transparent;
+      padding: 0.5rem 1rem; /* Matched index.html */
+      font-size: 1.5rem;
+      line-height: 1;
+      color: white;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .mode-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* --- User Auth Controls (Copied EXACTLY from index.html) --- */
+    #auth-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-left: 1rem;
+    }
+
+    #auth-controls .welcome-message {
+        color: white;
+        font-weight: 500;
+    }
+
+    #auth-controls .auth-link {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border: 2px solid transparent;
+        border-radius: 20px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #auth-controls .auth-link:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-color: white;
+    }
+
+    #auth-controls #logout-button {
+        background-color: #e74c3c; /* Red color for logout */
+        color: white;
+        border: 2px solid #e74c3c;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+    #auth-controls #logout-button:hover {
+        background-color: #c0392b; /* Darker red on hover */
+        border-color: #c0392b;
+    }
+    body.dark #auth-controls #logout-button {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+    body.dark #auth-controls #logout-button:hover {
+        background-color: #a02d22;
+        border-color: #a02d22;
+    }
+
+    /* --- Main Content Area (FIXED: Added back this entire block) --- */
+    main {
+      flex-grow: 1;
+      max-width: 900px;
+      margin: 0 auto; /* Removed top margin */
+      padding: 1.5rem 1rem 0; /* Added padding-top to give space for content */
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* --- ORIGINAL FARM.HTML STYLES BELOW --- */
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.3s ease;
+      max-width: fit-content;
+    }
+
+    .back-link:hover {
+      border-color: var(--primary-color);
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      max-height: 450px;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      background: #ddd;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+      border-radius: var(--border-radius);
+      user-select: none;
+    }
+
+    .carousel button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      padding: 0 12px;
+      cursor: pointer;
+      border-radius: 50%;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .carousel button:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .carousel .prev { left: 10px; }
+    .carousel .next { right: 10px; }
+
+    h2 {
+      margin-top: 0;
+      font-size: 2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .farm-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      background-color: var(--info-bg);
+      padding: 1rem 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .info-text {
+      flex: 1 1 300px;
+    }
+
+    .farm-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .farm-info span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .description {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text-color);
+      white-space: pre-line;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      background-color: var(--card-bg);
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    #map {
+      height: 350px;
+      width: 100%;
+      border-radius: var(--border-radius);
+      margin-top: 2rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    body.dark .carousel {
+      background: #444;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+    }
+    body.dark .farm-details {
+      background-color: var(--info-bg);
+    }
+    body.dark .description {
+      border-color: #555;
+      background-color: #222;
+    }
+    body.dark #map {
+      filter: brightness(0.9) contrast(1.2);
+    }
+
+    @media (max-width: 700px) {
+      .farm-details {
+        flex-direction: column;
+      }
+    }
+
+    /* Responsive header (Copied EXACTLY from index.html CSS) */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto; /* Allow height to adjust */
+        padding: 0.5rem 1rem;
+      }
+
+      .logo {
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .controls {
+        justify-content: flex-end;
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .logo img {
+        max-height: 40px; /* Matched index.html's mobile size */
+      }
+      .lang-toggle, .mode-toggle {
+          padding: 0.3rem 0.6rem;
+          font-size: 1rem;
+      }
+    }
+    .amenities-section {
+      flex: 1 1 300px;
+      background-color: var(--card-bg);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .amenities-section h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    #amenities-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.7rem;
+    }
+
+    #amenities-list li {
+      background-color: var(--info-bg);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    /* Dark mode adjustments for amenities */
+    body.dark .amenities-section {
+      background-color: var(--card-bg); /* Use dark card background */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+
+    body.dark #amenities-list li {
+      background-color: var(--info-bg); /* Use dark info background */
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+  <a href="index.html">
+    <img src="./logo.png" alt="logo" width="230">
+  </a>
+  <h1 id="site-title" style="display: none;">Farm Rentals</h1>
+</div>
+    <div class="controls">
+      <button class="lang-toggle" onclick="toggleLanguage()">العربية</button>
+      <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">☀️</button>
+      <div id="auth-controls">
+        </div>
+    </div>
+  </header>
+  <main>
+    <a href="index.html" class="back-link fade-up" style="animation-delay: 0.1s;">← Back to Farms</a>
+    <div class="carousel fade-up" style="animation-delay: 0.2s;" id="carousel">
+      <button class="prev" aria-label="Previous Image">&#10094;</button>
+      <img id="farm-image" src="" alt="Farm Image" draggable="false" />
+      <button class="next" aria-label="Next Image">&#10095;</button>
+    </div>
+    <h2 id="farm-title" class="fade-up" style="animation-delay: 0.3s;"></h2>
+    <div class="farm-details fade-up" style="animation-delay: 0.4s;">
+      <div class="info-text">
+        <div class="farm-info">
+          <span id="farm-location">📍 Location: </span>
+          <span id="farm-price">💰 Price: </span>
+        </div>
+        <div class="description" id="farm-description"></div>
+      </div>
+      <div class="amenities-section">
+        <h3>Amenities:</h3>
+        <ul id="amenities-list">
+          </ul>
+      </div>
+    </div>
+    <div id="map" class="fade-up" style="animation-delay: 0.5s;"></div>
+  </main>
+  <script>
+    const farms = [
+      {
+        id: 0, // Added ID for consistency
+        title: { en: 'Green Valley Farm', ar: 'مزرعة الوادي الأخضر' },
+        location: { en: 'Madaba', ar: 'مادبا' },
+        price: 70,
+        lat: 31.7157,
+        lng: 35.7935,
+        images: ['https://images.unsplash.com/photo-1551907234-3f2b2dbdc1a3', 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0'],
+        description: {
+          en: 'A beautiful farm in Madaba with a pool and garden.',
+          ar: 'مزرعة جميلة في مأدبا مع مسبح وحديقة.'
+        },
+        amenities: {
+          en: ['Pool', 'Garden', 'BBQ Area', 'Parking', 'Wi-Fi'],
+          ar: ['مسبح', 'حديقة', 'منطقة شواء', 'موقف سيارات', 'واي فاي']
+        }
+      },
+      {
+        id: 1, // Added ID for consistency
+        title: { en: 'Palm Garden Farm', ar: 'مزرعة حديقة النخيل' },
+        location: { en: 'Naour', ar: 'ناعور' },
+        price: 100,
+        lat: 31.9451,
+        lng: 35.8736,
+        images: ['https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0', 'https://images.unsplash.com/photo-1523413651479-597eb2da0ad6'],
+        description: {
+          en: 'Spacious farm with palm trees and open seating in Naour.',
+          ar: 'مزرعة واسعة بأشجار النخيل وجلسات خارجية في ناعور.'
+        },
+        amenities: {
+          en: ['Palm Trees', 'Open Seating', 'Playground', 'Outdoor Shower'],
+          ar: ['أشجار النخيل', 'جلسات خارجية', 'ملعب أطفال', 'دش خارجي', 'مسبح']
+        }
+      },
+      {
+        id: 2, // Added ID for consistency
+        title: { en: 'Dead Sea Escape', ar: 'ملاذ البحر الميت' },
+        location: { en: 'Dead Sea', ar: 'البحر الميت' },
+        price: 150,
+        lat: 31.5590,
+        lng: 35.4732,
+        images: ['https://images.unsplash.com/photo-1523413651479-597eb2da0ad6'],
+        description: {
+          en: 'Relax at a peaceful farm retreat by the Dead Sea.',
+          ar: 'استرخِ في منتجع مزرعة هادئ بجانب البحر الميت.'
+        },
+        amenities: {
+          en: ['Sea Access', 'Sun Terrace', 'Air Conditioning', 'Kitchenette'],
+          ar: ['وصول إلى البحر', 'تراس شمسي', 'تكييف هواء', 'مطبخ صغير', 'منطقة شواء']
+        }
+      }
+    ];
+
+    const translations = {
+      en: {
+        title: 'Farm Details',
+        back: '← Back to Farms',
+        button: 'العربية',
+        amenitiesHeading: 'Amenities:', 
+        noAmenities: 'No specific amenities listed.', 
+        location: 'Location:', 
+        price: 'Price:',
+        welcome: 'Welcome, ', 
+        signOut: 'Sign Out', 
+        signIn: 'Sign In', 
+        signUp: 'Sign Up' 
+      },
+      ar: {
+        title: 'تفاصيل المزرعة',
+        back: '← العودة إلى المزارع',
+        button: 'English',
+        amenitiesHeading: 'المرافق:', 
+        noAmenities: 'لا توجد مرافق محددة مدرجة.', 
+        location: 'الموقع:', 
+        price: 'السعر:',
+        welcome: 'أهلاً بك، ', 
+        signOut: 'تسجيل الخروج', 
+        signIn: 'تسجيل الدخول', 
+        signUp: 'إنشاء حساب' 
+      }
+    };
+
+    // Load saved language or default to English
+    let currentLang = localStorage.getItem('language') || 'en';
+    // Load dark mode state
+    let isDark = localStorage.getItem('darkMode') === 'true';
+    let currentImageIndex = 0;
+    let mapInstance = null; // Declare a global variable to hold the map instance
+
+    // Apply dark mode if saved
+    if (isDark) {
+      document.body.classList.add('dark');
+      document.getElementById('mode-icon').textContent = '🌙';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const farmId = parseInt(urlParams.get('id'));
+    const farm = farms[farmId];
+
+    const farmImageEl = document.getElementById('farm-image');
+    const farmTitleEl = document.getElementById('farm-title');
+    const farmLocationEl = document.getElementById('farm-location');
+    const farmPriceEl = document.getElementById('farm-price');
+    const farmDescEl = document.getElementById('farm-description');
+    const prevBtn = document.querySelector('.carousel .prev');
+    const nextBtn = document.querySelector('.carousel .next');
+    const farmAmenitiesEl = document.getElementById('amenities-list');
+    const amenitiesHeadingEl = document.querySelector('.amenities-section h3');
+    
+    // Auth Controls (NEW)
+    const authControls = document.getElementById('auth-controls');
+
+    // Displays auth state (logged in/out) in header
+    function checkLoginStatus() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const t = translations[currentLang];
+        authControls.innerHTML = ''; // Clear previous content
+
+        if (currentUser && currentUser.fullname) {
+            // Logged in: show welcome message and logout button
+            const welcomeSpan = document.createElement('span');
+            welcomeSpan.classList.add('welcome-message');
+            welcomeSpan.textContent = `${t.welcome}${currentUser.fullname}`;
+
+            const logoutButton = document.createElement('button');
+            logoutButton.id = 'logout-button';
+            logoutButton.textContent = t.signOut;
+            logoutButton.addEventListener('click', logoutUser);
+
+            authControls.appendChild(welcomeSpan);
+            authControls.appendChild(logoutButton);
+        } else {
+            // Logged out: show Sign In and Sign Up links
+            const signInLink = document.createElement('a');
+            signInLink.href = 'signin.html';
+            signInLink.classList.add('auth-link');
+            signInLink.textContent = t.signIn;
+
+            const signUpLink = document.createElement('a');
+            signUpLink.href = 'signup.html';
+            signUpLink.classList.add('auth-link');
+            signUpLink.textContent = t.signUp;
+
+            authControls.appendChild(signInLink);
+            authControls.appendChild(signUpLink);
+        }
+    }
+
+    // Handles user logout
+    function logoutUser() {
+        localStorage.removeItem('currentUser'); // Clear logged-in user from local storage
+        window.location.href = 'index.html'; // Redirect to main page or a logged-out state
+    }
+
+
+    // Apply language settings UI and save choice
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      document.getElementById('site-title').textContent = t.title;
+      document.querySelector('.back-link').textContent = t.back;
+      document.querySelector('.lang-toggle').textContent = t.button;
+        if (amenitiesHeadingEl) {
+      amenitiesHeadingEl.textContent = t.amenitiesHeading;
+    }
+      // Translate general info labels
+      document.getElementById('farm-location').firstChild.nodeValue = `📍 ${t.location} `;
+      document.getElementById('farm-price').firstChild.nodeValue = `💰 ${t.price} `;
+      if (farm) {
+      updateFarmDetails(farm);
+      }
+
+      initMap(); // Re-initialize map to update language for popup
+      checkLoginStatus(); // Update login/logout links in header
+      localStorage.setItem('language', currentLang);
+    }
+    // Toggle language and apply changes
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      applyLanguage();
+    }
+
+    // Toggle dark mode and save state
+    function toggleMode() {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      document.getElementById('mode-icon').textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    }
+
+    // NEW HELPER FUNCTION to update all farm-specific text
+    function updateFarmDetails(farmData) {
+        if (!farmData) return; // Guard clause
+
+        const t = translations[currentLang]; // Get current translations
+
+        // Update main farm details
+        farmTitleEl.textContent = farmData.title[currentLang];
+        // Note the change here: using t.location and farmData.location[currentLang]
+        farmLocationEl.textContent = `📍 ${t.location} ${farmData.location[currentLang]}`;
+        // Note the change here: using t.price
+        farmPriceEl.textContent = `💰 ${t.price} ${farmData.price} JOD/day`;
+        farmDescEl.textContent = farmData.description[currentLang];
+        updateImage(); // Still handles image carousel
+
+        // Update amenities
+        // Note: access amenities via farmData.amenities[currentLang]
+        if (farmData.amenities && farmData.amenities[currentLang] && farmData.amenities[currentLang].length > 0) {
+            farmAmenitiesEl.innerHTML = ''; // Clear existing content
+            farmData.amenities[currentLang].forEach(amenity => {
+                const li = document.createElement('li');
+                li.textContent = amenity;
+                farmAmenitiesEl.appendChild(li);
+            });
+        } else {
+            farmAmenitiesEl.innerHTML = `<li>${t.noAmenities}</li>`; // Use translated no-amenities message
+        }
+    }
+    function updateImage() {
+      if (!farm || !farm.images || farm.images.length === 0) return;
+      farmImageEl.src = farm.images[currentImageIndex];
+      // FIX: Access the current language title for the alt text
+      farmImageEl.alt = `${farm.title[currentLang]} - Image ${currentImageIndex + 1}`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (!farm || !farm.images) return;
+      currentImageIndex = (currentImageIndex + 1) % farm.images.length;
+      updateImage();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (!farm || !farm.images) return;
+      currentImageIndex = (currentImageIndex - 1 + farm.images.length) % farm.images.length;
+      updateImage();
+    });
+
+    if (farm) {
+        updateFarmDetails(farm); // Call the new helper function
+    }
+
+    function initMap() {
+        if (!farm || !farm.lat || !farm.lng) return;
+
+        if (mapInstance) {
+            mapInstance.remove();
+            mapInstance = null;
+        }
+
+        const t = translations[currentLang];
+
+        mapInstance = L.map('map').setView([farm.lat, farm.lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        L.marker([farm.lat, farm.lng]).addTo(mapInstance).bindPopup(farm.title[currentLang]).openPopup();
+    }
+
+    window.onload = () => {
+      applyLanguage();
+      document.querySelectorAll('.fade-up').forEach(el => {
+        el.style.animationPlayState = 'running';
+      });
+      // initMap() is called inside applyLanguage() already
+    };
+  </script>
+</body>
+</html>

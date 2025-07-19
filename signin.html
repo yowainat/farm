@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In - Farm Rentals</title>
+  <style>
+    /* --- Root Variables & Dark Mode (Copied from signup.html for consistency) --- */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --header-bg: #16a085;
+      --footer-bg: #222;
+      --card-bg: #f9f9f9;
+      --card-border: #ccc;
+      --primary-color: #16a085;
+      --button-hover: #13856d;
+      --input-border: #ddd;
+      --error-color: #e74c3c;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --header-bg: #0e4d4d;
+      --footer-bg: #000;
+      --card-bg: #2c2c2c;
+      --card-border: #555;
+      --primary-color: #0e4d4d;
+      --button-hover: #084338;
+      --input-border: #666;
+      --error-color: #c0392b;
+    }
+
+    /* --- Base Body & Layout --- */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center content horizontally */
+      justify-content: center; /* Center content vertically */
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* --- Header (Simplified for auth pages) --- */
+     header {
+      height: 120px; /* Changed from 80px to 120px to match index.html */
+      position: fixed; /* Keep header visible */
+      top: 0;
+      width: 100%;
+      background: var(--header-bg);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      z-index: 10;
+      /* Remove overflow: hidden if it's there to prevent logo clipping */
+      /* This rule block in your provided signin.html doesn't have overflow: hidden, so it's fine. */
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100%; /* Matched index.html */
+    }
+    .logo img {
+      max-height: 130px; /* Changed from 55px to 75px */
+      width: auto;
+      display: block;
+    }
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .lang-toggle {
+        background: #ffffff;
+        color: var(--primary-color);
+        font-weight: bold;
+        border: 2px solid var(--primary-color);
+        padding: 0.4rem 0.8rem; /* Adjusted padding */
+        cursor: pointer;
+        border-radius: 20px;
+        transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    .lang-toggle:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: white;
+    }
+    .mode-toggle {
+        background: transparent;
+        border: 2px solid transparent;
+        padding: 0.4rem 0.8rem;
+        font-size: 1.3rem;
+        line-height: 1;
+        color: white;
+        cursor: pointer;
+        border-radius: 20px;
+        transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .mode-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+
+    /* --- Form Container --- */
+    .form-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 15px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+      text-align: center;
+      margin-top: 140px; /* Space from fixed header */
+    }
+
+    .form-container h2 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--bg-color); /* Use background color for input fields */
+      color: var(--text-color);
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(22, 160, 133, 0.2);
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.9em;
+      margin-top: 0.3rem;
+      display: none; /* Hidden by default */
+    }
+
+    .form-group.error input {
+        border-color: var(--error-color);
+    }
+    .form-group.error .error-message {
+        display: block !important; /* FORCED to display */
+    }
+
+    button[type="submit"] {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+      margin-top: 1.5rem;
+    }
+
+    button[type="submit"]:hover {
+      background-color: var(--button-hover);
+    }
+
+    .auth-links {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .auth-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    #response-message {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none; /* Hidden by default */
+    }
+
+    #response-message.success {
+      background-color: rgba(22, 160, 133, 0.1); /* Light primary color */
+      color: var(--primary-color);
+    }
+
+    #response-message.error {
+      background-color: rgba(231, 60, 50, 0.1); /* Light error color */
+      color: var(--error-color);
+    }
+
+    /* --- Responsive adjustments for header --- */
+    @media (max-width: 600px) {
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+            height: auto; /* Allow height to adjust */
+            padding: 0.5rem 1rem;
+        }
+        .logo {
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .controls {
+            justify-content: flex-end;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .logo img {
+            max-height: 60px; /* Changed from 35px to 60px for mobile consistency with index.html */
+        }
+        .lang-toggle, .mode-toggle {
+            padding: 0.3rem 0.6rem;
+            font-size: 1rem;
+        }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+  <a href="index.html">
+    <img src="./logo.png" alt="logo" width="230">
+  </a>
+  <h1 id="site-title" style="display: none;">Farm Rentals</h1>
+</div>
+    <div class="controls">
+      <button class="lang-toggle" onclick="toggleLanguage()">العربية</button>
+      <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">☀️</button>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <h2 id="signin-heading">Sign In</h2>
+    <form id="signin-form">
+      <div class="form-group" id="email-group">
+        <label for="email" id="email-label">Email</label>
+        <input type="email" id="email" name="email" />
+        <div class="error-message" id="email-error"></div>
+      </div>
+
+      <div class="form-group" id="password-group">
+        <label for="password" id="password-label">Password</label>
+        <input type="password" id="password" name="password" />
+        <div class="error-message" id="password-error"></div>
+      </div>
+
+      <button type="submit" id="signin-button">Sign In</button>
+    </form>
+    <div id="response-message" aria-live="polite"></div>
+    <div class="auth-links">
+      <span id="no-account-text">Don't have an account?</span>
+      <a href="signup.html" id="signup-link">Sign Up</a>
+    </div>
+  </div>
+
+  <script>
+    // --- Translations (Expanded for auth pages) ---
+    const translations = {
+      en: {
+        title: 'Farm Rentals',
+        signinHeading: 'Sign In',
+        emailLabel: 'Email',
+        passwordLabel: 'Password',
+        signinButton: 'Sign In',
+        noAccountText: 'Don\'t have an account?',
+        signupLink: 'Sign Up',
+        // Validation & Response messages
+        emailRequired: 'Email is required.',
+        emailInvalid: 'Invalid email format.',
+        passwordRequired: 'Password is required.', // Keep this for signin even if complex rules are for signup
+        loginSuccess: 'Login successful! Redirecting...',
+        loginFailed: 'Login failed: Invalid email or password.',
+        button: 'العربية'
+      },
+      ar: {
+        title: 'تأجير المزارع',
+        signinHeading: 'تسجيل الدخول',
+        emailLabel: 'البريد الإلكتروني',
+        passwordLabel: 'كلمة المرور',
+        signinButton: 'تسجيل الدخول',
+        noAccountText: 'ليس لديك حساب؟',
+        signupLink: 'إنشاء حساب',
+        // Validation & Response messages
+        emailRequired: 'البريد الإلكتروني مطلوب.',
+        emailInvalid: 'صيغة البريد الإلكتروني غير صحيحة.',
+        passwordRequired: 'كلمة المرور مطلوبة.', // Keep this for signin even if complex rules are for signup
+        loginSuccess: 'تم تسجيل الدخول بنجاح! جاري التحويل...',
+        loginFailed: 'فشل تسجيل الدخول: بريد إلكتروني أو كلمة مرور غير صحيحة.',
+        button: 'English'
+      }
+    };
+
+    // --- Global State & DOM References ---
+    let currentLang = localStorage.getItem('language') || 'en';
+    let isDark = localStorage.getItem('darkMode') === 'true';
+
+    // Header elements
+    const siteTitleEl = document.getElementById('site-title');
+    const langToggleButton = document.querySelector('.lang-toggle');
+    const modeToggleButton = document.getElementById('mode-icon');
+
+    // Form elements
+    const signinForm = document.getElementById('signin-form');
+    const signinHeading = document.getElementById('signin-heading');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const signinButton = document.getElementById('signin-button');
+    const responseMessage = document.getElementById('response-message');
+    const noAccountText = document.getElementById('no-account-text');
+    const signupLink = document.getElementById('signup-link');
+
+    // Form group error elements
+    const emailGroup = document.getElementById('email-group');
+    const passwordGroup = document.getElementById('password-group');
+
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+
+
+    // --- Functions ---
+
+    // Apply dark mode if saved
+    if (isDark) {
+      document.body.classList.add('dark');
+      modeToggleButton.textContent = '🌙';
+    }
+
+    // Applies current language settings to all dynamic text on the page
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+      // Header
+      siteTitleEl.textContent = t.title;
+      langToggleButton.textContent = t.button;
+
+      // Form
+      signinHeading.textContent = t.signinHeading;
+      document.getElementById('email-label').textContent = t.emailLabel;
+      document.getElementById('password-label').textContent = t.passwordLabel;
+      signinButton.textContent = t.signinButton;
+      noAccountText.textContent = t.noAccountText;
+      signupLink.textContent = t.signupLink;
+      
+      // Clear and re-validate any existing error messages to update their text
+      resetFormErrors(); 
+      // This will ensure current validation messages are updated on language switch
+      validateForm(true); // Pass true to avoid immediate scroll on language switch
+
+      localStorage.setItem('language', currentLang);
+    }
+
+    // Toggle language
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      applyLanguage();
+    }
+
+    // Toggle dark mode
+    function toggleMode() {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      modeToggleButton.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    }
+
+    // --- Form Validation Functions ---
+
+    function showError(element, message, groupElement) {
+        element.textContent = message;
+        groupElement.classList.add('error');
+    }
+
+    function clearError(element, groupElement) {
+        element.textContent = '';
+        groupElement.classList.remove('error');
+    }
+
+    function resetFormErrors() {
+        clearError(emailError, emailGroup);
+        clearError(passwordError, passwordGroup);
+        responseMessage.style.display = 'none';
+        responseMessage.className = '';
+    }
+
+    function validateEmail(email) {
+        const t = translations[currentLang];
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            showError(emailError, t.emailRequired, emailGroup);
+            return false;
+        } else if (!emailRegex.test(email)) {
+            showError(emailError, t.emailInvalid, emailGroup);
+            return false;
+        }
+        clearError(emailError, emailGroup);
+        return true;
+    }
+
+    function validatePassword(password) { // Simple validation for sign-in
+        const t = translations[currentLang];
+        if (!password) {
+            showError(passwordError, t.passwordRequired, passwordGroup);
+            return false;
+        }
+        clearError(passwordError, passwordGroup);
+        return true;
+    }
+
+    function validateForm(isLanguageSwitch = false) {
+        resetFormErrors(); // Clear all previous errors
+        
+        let isValid = true;
+
+        if (!validateEmail(emailInput.value.trim())) {
+            isValid = false;
+        }
+        if (!validatePassword(passwordInput.value)) { // Use simple validation here
+            isValid = false;
+        }
+        
+        if (!isLanguageSwitch && !isValid) {
+            const firstErrorGroup = document.querySelector('.form-group.error');
+            if (firstErrorGroup) {
+                firstErrorGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        return isValid;
+    }
+
+
+    // --- Form Submission Handler ---
+    signinForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      if (validateForm()) { // Run all validations
+        const t = translations[currentLang];
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        // Retrieve registered users from Local Storage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Check if credentials match a registered user
+        const foundUser = users.find(user => user.email === email && user.password === password); // Simple match
+
+        if (foundUser) {
+          responseMessage.textContent = t.loginSuccess;
+          responseMessage.classList.add('success');
+          responseMessage.classList.remove('error');
+          responseMessage.style.display = 'block';
+
+          // Simulate successful login: save user state (e.g., current user email)
+          localStorage.setItem('currentUser', JSON.stringify({ email: foundUser.email, fullname: foundUser.fullname }));
+
+          // Redirect to the main page after a short delay
+          setTimeout(() => {
+            window.location.href = 'index.html'; 
+          }, 1500); // 1.5 second delay
+        } else {
+          // Invalid credentials
+          responseMessage.textContent = t.loginFailed;
+          responseMessage.classList.add('error');
+          responseMessage.classList.remove('success');
+          responseMessage.style.display = 'block';
+        }
+      } else {
+        // Form validation failed, errors are already shown
+        responseMessage.style.display = 'none';
+      }
+    });
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+      applyLanguage(); // Apply initial language and dark mode based on localStorage
+    });
+  </script>
+</body>
+</html>

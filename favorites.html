@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favorite Farms | Farm Rentals Jordan</title>
+  <link rel="stylesheet" type="text/css" href="./index.css">    
+</head>
+<body>
+  <header>
+    <div class="logo">
+  <a href="index.html">
+    <img src="./logo.png" alt="logo" width="230">
+  </a>
+  <h1 id="site-title" style="display: none;">Farm Rentals</h1>
+</div>
+    <div class="controls">
+      <button class="lang-toggle" onclick="toggleLanguage()">العربية</button>
+      <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">☀️</button>
+      <a href="index.html" class="home-toggle" id="home-button">🏠 Home</a>
+      
+      <div id="auth-controls"></div>
+    </div>
+  </header>
+
+  <section class="hero fade-up" id="hero-text" style="animation-delay: 0.1s;">
+    Your Favorite Farms
+  </section>
+
+  <div class="main-content-wrapper">
+    <section class="farm-grid" id="farm-grid"></section>
+
+    <button id="filter-bar-toggle-button">&#9664;</button>
+
+    <div id="filter-sidebar">
+      <h3>Filters</h3>
+      <div class="filter-section">
+        <label for="search-input">Search:</label>
+        <input type="text" id="search-input" placeholder="Search by keyword...">
+      </div>
+
+      <div class="filter-section">
+        <label for="location-filter">Location:</label>
+        <select id="location-filter">
+          <option value="">All Locations</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <label for="price-filter">Price:</label>
+        <select id="price-filter">
+          <option value="">All Prices</option>
+          <option value="100">Below 100 JOD</option>
+          <option value="150">Below 150 JOD</option>
+          <option value="200">Below 200 JOD</option>
+          <option value="500">Below 500 JOD</option>
+        </select>
+      </div>
+      
+      <div class="filter-section collapsible-amenities-group">
+        <h4 id="amenities-heading-toggle">Amenities: <span class="toggle-arrow">&#9658;</span></h4> 
+        <div id="amenities-checkboxes-content" class="amenities-checkboxes-content">
+          <div id="amenities-checkboxes"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Farm Rentals Jordan | Contact us: info@farmjo.com
+  </footer>
+
+<script>
+  // --- Farm Data ---
+  const farms = [
+    {
+      id: 0,
+      title: { en: 'Green Valley Farm', ar: 'مزرعة الوادي الأخضر' },
+      location: { en: 'Madaba', ar: 'مادبا' },
+      price: 70,
+      image: 'https://images.unsplash.com/photo-1551907234-3f2b2dbdc1a3',
+      description: {
+        en: 'A beautiful farm in Madaba with a pool and garden. Perfect for family gatherings and relaxing.',
+        ar: 'مزرعة جميلة في مأدبا مع مسبح وحديقة. مثالية للتجمعات العائلية والاسترخاء.'
+      },
+      amenities: {
+        en: ['Pool', 'Garden', 'BBQ Area', 'Parking', 'Wi-Fi'],
+        ar: ['مسبح', 'حديقة', 'منطقة شواء', 'موقف سيارات', 'واي فاي']
+      }
+    },
+    {
+      id: 1,
+      title: { en: 'Palm Garden Farm', ar: 'مزرعة حديقة النخيل' },
+      location: { en: 'Naour', ar: 'ناعور' },
+      price: 100,
+      image: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
+      description: {
+        en: 'Spacious farm with palm trees and open seating in Naour. Ideal for large events.',
+        ar: 'مزرعة واسعة بأشجار النخيل وجلسات خارجية في ناعور. مثالية للمناسبات الكبيرة.'
+      },
+      amenities: {
+        en: ['Palm Trees', 'Open Seating', 'Playground', 'Outdoor Shower', 'Pool'],
+        ar: ['أشجار النخيل', 'جلسات خارجية', 'ملعب أطفال', 'دش خارجي', 'مسبح']
+      }
+    },
+    {
+      id: 2,
+      title: { en: 'Dead Sea Escape', ar: 'ملاذ البحر الميت' },
+      location: { en: 'Dead Sea', ar: 'البحر الميت' },
+      price: 150,
+      image: 'https://images.unsplash.com/photo-1523413651479-597eb2da0ad6',
+      description: {
+        en: 'Relax at a peaceful farm retreat by the Dead Sea, offering stunning views.',
+        ar: 'استرخِ في منتجع مزرعة هادئ بجانب البحر الميت، ويوفر إطلالات خلابة.'
+      },
+      amenities: {
+        en: ['Sea Access', 'Sun Terrace', 'Air Conditioning', 'Kitchenette', 'BBQ Area'],
+        ar: ['وصول إلى البحر', 'تراس شمسي', 'تكييف هواء', 'مطبخ صغير', 'منطقة شواء']
+      }
+    }
+  ];
+
+  // --- Translations ---
+  const translations = {
+    en: {
+      title: 'Favorite Farms',
+      hero: 'Your Favorite Farms',
+      button: 'العربية',
+      homeButton: "🏠 Home",
+      favoritesButton: "❤️ Favorites",
+      searchPlaceholder: 'Search by keyword...',
+      allLocations: 'All Locations',
+      allPrices: 'All Prices',
+      below: 'Below',
+      jodDay: 'JOD/day',
+      amenitiesHeading: 'Amenities:',
+      noFavoritesFound: 'You haven\'t favorited any farms yet.',
+      locationPrefix: 'Location:',
+      pricePrefix: 'Price:',
+      filtersHeading: 'Filters',
+      welcome: 'Welcome, ',
+      signOut: 'Sign Out',
+      signIn: 'Sign In',
+      signUp: 'Sign Up'
+    },
+    ar: {
+      title: 'المزارع المفضلة',
+      hero: 'مزارعك المفضلة',
+      button: 'English',
+      homeButton: "🏠 الرئيسية",
+      favoritesButton: "❤️ المفضلة",
+      searchPlaceholder: 'ابحث بالكلمات المفتاحية...',
+      allLocations: 'جميع المواقع',
+      allPrices: 'جميع الأسعار',
+      below: 'أقل من',
+      jodDay: 'دينار/يوم',
+      amenitiesHeading: 'المرافق:',
+      noFavoritesFound: 'لم تقم بإضافة أي مزارع إلى المفضلة بعد.',
+      locationPrefix: 'الموقع:',
+      pricePrefix: 'السعر:',
+      filtersHeading: 'التصفيات',
+      welcome: 'أهلاً بك، ',
+      signOut: 'تسجيل الخروج',
+      signIn: 'تسجيل الدخول',
+      signUp: 'إنشاء حساب'
+    }
+  };
+
+  // --- Icons for amenities ---
+  const amenityIcons = {
+    'Pool': '🏊', 'مسبح': '🏊',
+    'Garden': '🌳', 'حديقة': '🌳',
+    'BBQ Area': '♨️', 'منطقة شواء': '♨️',
+    'Parking': '🚗', 'موقف سيارات': '🚗',
+    'Wi-Fi': '📶', 'واي فاي': '📶',
+    'Palm Trees': '🌴', 'أشجار النخيل': '🌴',
+    'Open Seating': '🛋️', 'جلسات خارجية': '🛋️',
+    'Playground': '⚽', 'ملعب أطفال': '⚽',
+    'Outdoor Shower': '🚿', 'دش خارجي': '🚿',
+    'Sea Access': '🌊', 'وصول إلى البحر': '🌊',
+    'Sun Terrace': '🌞', 'تراس شمسي': '🌞',
+    'Air Conditioning': '🌬️', 'تكييف هواء': '🌬️',
+    'Kitchenette': '🍽️', 'مطبخ صغير': '🍽️'
+  };
+
+  // --- Global State ---
+  let currentLang = localStorage.getItem('language') || 'en';
+  let isDark = localStorage.getItem('darkMode') === 'true';
+  let selectedAmenities = new Set();
+
+  // --- DOM References ---
+  const siteTitleEl = document.getElementById('site-title');
+  const heroTextEl = document.getElementById('hero-text');
+  const langToggleButton = document.querySelector('.lang-toggle');
+  const modeToggleButton = document.getElementById('mode-icon');
+  const searchInput = document.getElementById('search-input');
+  const locationFilter = document.getElementById('location-filter');
+  const priceFilter = document.getElementById('price-filter');
+  const farmGrid = document.getElementById('farm-grid');
+  const filterBarToggleButton = document.getElementById('filter-bar-toggle-button');
+  const filterSidebar = document.getElementById('filter-sidebar');
+  const filterSidebarHeading = filterSidebar.querySelector('h3');
+  const amenitiesHeadingToggle = document.getElementById('amenities-heading-toggle');
+  const amenitiesCheckboxesContent = document.getElementById('amenities-checkboxes-content');
+  const amenitiesCheckboxesContainer = document.getElementById('amenities-checkboxes');
+  const authControls = document.getElementById('auth-controls');
+  const homeButton = document.getElementById('home-button');
+  const favoritesButton = document.getElementById('favorites-button');
+
+  // --- Functions ---
+
+  // Initialize dark mode
+  if (isDark) {
+    document.body.classList.add('dark');
+    modeToggleButton.textContent = '🌙';
+  }
+
+  function checkLoginStatus() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const t = translations[currentLang];
+    authControls.innerHTML = '';
+
+    if (currentUser && currentUser.fullname) {
+      const welcomeSpan = document.createElement('span');
+      welcomeSpan.classList.add('welcome-message');
+      welcomeSpan.textContent = `${t.welcome}${currentUser.fullname}`;
+
+      const logoutButton = document.createElement('button');
+      logoutButton.id = 'logout-button';
+      logoutButton.textContent = t.signOut;
+      logoutButton.addEventListener('click', logoutUser);
+
+      authControls.appendChild(welcomeSpan);
+      authControls.appendChild(logoutButton);
+    } else {
+      const signInLink = document.createElement('a');
+      signInLink.href = 'signin.html';
+      signInLink.classList.add('auth-link');
+      signInLink.textContent = t.signIn;
+
+      const signUpLink = document.createElement('a');
+      signUpLink.href = 'signup.html';
+      signUpLink.classList.add('auth-link');
+      signUpLink.textContent = t.signUp;
+
+      authControls.appendChild(signInLink);
+      authControls.appendChild(signUpLink);
+    }
+  }
+
+  function logoutUser() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+  }
+
+  function getFavoriteFarms() {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    return farms.filter(farm => favorites.includes(farm.id));
+  }
+
+  function applyLanguage() {
+    const t = translations[currentLang];
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+    siteTitleEl.textContent = t.title;
+    heroTextEl.textContent = t.hero;
+    langToggleButton.textContent = t.button;
+    searchInput.placeholder = t.searchPlaceholder;
+    filterSidebarHeading.textContent = t.filtersHeading;
+    homeButton.textContent = t.homeButton;
+
+    // Update location filter options
+    const uniqueLocations = new Set();
+    farms.forEach(farm => uniqueLocations.add(farm.location.en));
+    locationFilter.innerHTML = `<option value="">${t.allLocations}</option>`;
+    Array.from(uniqueLocations).sort().forEach(locEn => {
+      const locTranslation = farms.find(f => f.location.en === locEn)?.location[currentLang] || locEn;
+      const option = document.createElement('option');
+      option.value = locEn;
+      option.textContent = locTranslation;
+      locationFilter.appendChild(option);
+      if (favoritesButton) {
+        favoritesButton.textContent = t.favoritesButton;
+      }
+    });
+
+    // Update price filter options
+    priceFilter.innerHTML = `
+      <option value="">${t.allPrices}</option>
+      <option value="100">${t.below} 100 ${t.jodDay}</option>
+      <option value="150">${t.below} 150 ${t.jodDay}</option>
+      <option value="200">${t.below} 200 ${t.jodDay}</option>
+      <option value="500">${t.below} 500 ${t.jodDay}</option>
+    `;
+
+    // Update amenities heading
+    amenitiesHeadingToggle.firstChild.nodeValue = `${t.amenitiesHeading} `;
+
+    renderAmenityFilters();
+    applyFilters();
+    checkLoginStatus();
+    localStorage.setItem('language', currentLang);
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    applyLanguage();
+  }
+
+  function toggleMode() {
+    isDark = !isDark;
+    document.body.classList.toggle('dark', isDark);
+    modeToggleButton.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+  }
+
+  function renderFarms(farmsToRender = getFavoriteFarms()) {
+    farmGrid.innerHTML = '';
+    const t = translations[currentLang];
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+    if (farmsToRender.length === 0) {
+        farmGrid.innerHTML = `<p style="text-align:center; padding: 2rem;">${t.noFavoritesFound}</p>`;
+        return;
+    }
+
+    farmsToRender.forEach((farm, index) => {
+        const amenitiesHtml = farm.amenities[currentLang]
+            .map(a => `<span>${amenityIcons[a] || ''} ${a}</span>`)
+            .join(' ');
+        
+        const isFavorited = favorites.includes(farm.id);
+
+        const card = document.createElement('a');
+        card.className = 'farm-card fade-up';
+        card.href = `farm.html?id=${farm.id}`;
+        card.style.animationDelay = `${index * 0.15}s`;
+
+        card.innerHTML = `
+            <div class="farm-card-inner">
+                <button class="fav-btn ${isFavorited ? 'favorited' : ''}" data-id="${farm.id}" aria-label="Favorite">
+                    <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s-8-7-8-11a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 4-8 11-8 11z"/>
+                    </svg>
+                </button>
+                <img src="${farm.image}" alt="${farm.title[currentLang]} - ${t.locationPrefix} ${farm.location[currentLang]}">
+                <div class="content">
+                    <h3 class="farm-title">${farm.title[currentLang]}</h3>
+                    <p class="farm-location">📍 ${t.locationPrefix} ${farm.location[currentLang]}</p>
+                    <p class="farm-price">💰 ${t.pricePrefix} ${farm.price} ${t.jodDay}</p>
+                    <p class="farm-description">${farm.description[currentLang]}</p>
+                    <div class="amenities-in-card">
+                        <strong>${t.amenitiesHeading}</strong>
+                        <div>${amenitiesHtml}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        farmGrid.appendChild(card);
+    });
+}
+
+  function renderAmenityFilters() {
+    amenitiesCheckboxesContainer.innerHTML = '';
+    const allAmenitiesEn = new Set();
+    const amenityTranslationsMap = new Map();
+
+    farms.forEach(farm => {
+      if (farm.amenities && farm.amenities.en && farm.amenities.ar) {
+        farm.amenities.en.forEach((amenityEn, index) => {
+          allAmenitiesEn.add(amenityEn);
+          if (farm.amenities.ar[index]) {
+            amenityTranslationsMap.set(amenityEn, farm.amenities.ar[index]);
+          }
+        });
+      }
+    });
+
+    const sortedAmenitiesEn = Array.from(allAmenitiesEn).sort();
+    const t = translations[currentLang];
+
+    sortedAmenitiesEn.forEach(amenityEn => {
+      const amenityLabel = currentLang === 'en' ? amenityEn : amenityTranslationsMap.get(amenityEn) || amenityEn;
+      const checkboxId = `amenity-${amenityEn.toLowerCase().replace(/\s/g, '-')}`;
+
+      const label = document.createElement('label');
+      label.setAttribute('for', checkboxId);
+      label.innerHTML = `
+        <input type="checkbox" id="${checkboxId}" value="${amenityEn}" ${selectedAmenities.has(amenityEn) ? 'checked' : ''}>
+        ${amenityIcons[amenityEn] || ''} ${amenityLabel}
+      `;
+      amenitiesCheckboxesContainer.appendChild(label);
+
+      label.querySelector('input[type="checkbox"]').addEventListener('change', (event) => {
+        if (event.target.checked) {
+          selectedAmenities.add(event.target.value);
+        } else {
+          selectedAmenities.delete(event.target.value);
+        }
+        applyFilters();
+      });
+    });
+  }
+
+  function applyFilters() {
+    const searchKeyword = searchInput.value.toLowerCase();
+    const selectedLocation = locationFilter.value;
+    const maxPrice = parseInt(priceFilter.value);
+    const amenitiesToMatch = Array.from(selectedAmenities);
+
+    const filtered = getFavoriteFarms().filter(farm => {
+      const farmTitleEn = farm.title.en ? farm.title.en.toLowerCase() : '';
+      const farmDescEn = farm.description.en ? farm.description.en.toLowerCase() : '';
+      const farmLocationEn = farm.location.en;
+
+      const matchesKeyword = farmTitleEn.includes(searchKeyword) || farmDescEn.includes(searchKeyword);
+      const matchesLocation = !selectedLocation || farmLocationEn === selectedLocation;
+      const matchesPrice = !maxPrice || farm.price <= maxPrice;
+      const matchesAmenities = amenitiesToMatch.length === 0 ||
+        (farm.amenities && farm.amenities.en &&
+          amenitiesToMatch.every(amenity => farm.amenities.en.includes(amenity)));
+
+      return matchesKeyword && matchesLocation && matchesPrice && matchesAmenities;
+    });
+
+    renderFarms(filtered);
+  }
+
+  // --- Event Listeners ---
+  searchInput.addEventListener('input', applyFilters);
+  locationFilter.addEventListener('change', applyFilters);
+  priceFilter.addEventListener('change', applyFilters);
+
+  filterBarToggleButton.addEventListener('click', () => {
+    filterSidebar.classList.toggle('open');
+    if (currentLang === 'ar') {
+      filterBarToggleButton.textContent = filterSidebar.classList.contains('open') ? '►' : '◄';
+    } else {
+      filterBarToggleButton.textContent = filterSidebar.classList.contains('open') ? '◄' : '►';
+    }
+  });
+
+  amenitiesHeadingToggle.addEventListener('click', () => {
+    amenitiesCheckboxesContent.classList.toggle('open');
+    const arrow = amenitiesHeadingToggle.querySelector('.toggle-arrow');
+    if (amenitiesCheckboxesContent.classList.contains('open')) {
+      arrow.textContent = '▼';
+    } else {
+      arrow.textContent = '►';
+    }
+  });
+
+  // --- Initialization ---
+  applyLanguage();
+   if (favoritesButton && homeButton) {
+    // Set initial active state
+    favoritesButton.classList.add('active');
+    
+    // Favorites button click handler
+    favoritesButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      favoritesButton.classList.add('active');
+      homeButton.classList.remove('active');
+    });
+
+    // Home button click handler
+    homeButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      homeButton.classList.add('active');
+      favoritesButton.classList.remove('active');
+      window.location.href = 'index.html';
+    });
+  }
+  farmGrid.addEventListener('click', (e) => {
+    if (e.target.closest('.fav-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.fav-btn');
+        const id = parseInt(btn.dataset.id);
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const index = favorites.indexOf(id);
+
+        if (index > -1) {
+            favorites.splice(index, 1);
+            btn.classList.remove('favorited');
+        } else {
+            favorites.push(id);
+            btn.classList.add('favorited');
+        }
+        
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        
+        // If on favorites page, refresh the list after removal
+        if (window.location.pathname.includes('favorites.html') && index > -1) {
+            renderFarms();
+        }
+    }
+});
+</script>
+</body>
+</html>

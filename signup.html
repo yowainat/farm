@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - Farm Rentals</title>
+  <style>
+    /* --- Root Variables & Dark Mode (Copied from index.html for consistency) --- */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --header-bg: #16a085;
+      --footer-bg: #222;
+      --card-bg: #f9f9f9;
+      --card-border: #ccc;
+      --primary-color: #16a085;
+      --button-hover: #13856d;
+      --input-border: #ddd;
+      --error-color: #e74c3c;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --header-bg: #0e4d4d;
+      --footer-bg: #000;
+      --card-bg: #2c2c2c;
+      --card-border: #555;
+      --primary-color: #0e4d4d;
+      --button-hover: #084338;
+      --input-border: #666;
+      --error-color: #c0392b;
+    }
+
+    /* --- Base Body & Layout --- */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center content horizontally */
+      justify-content: center; /* Center content vertically */
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* --- Header (Simplified for auth pages) --- */
+     header {
+      height: 120px; /* Changed from 80px to 120px to match index.html */
+      position: fixed; /* Keep header visible */
+      top: 0;
+      width: 100%;
+      background: var(--header-bg);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      z-index: 10;
+      /* Remove overflow: hidden if it's there to prevent logo clipping */
+      /* This rule block in your provided signin.html doesn't have overflow: hidden, so it's fine. */
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100%; /* Matched index.html */
+    }
+    .logo img {
+      max-height: 130px; /* Changed from 55px to 75px */
+      width: auto;
+      display: block;
+    }
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .lang-toggle {
+        background: #ffffff;
+        color: var(--primary-color);
+        font-weight: bold;
+        border: 2px solid var(--primary-color);
+        padding: 0.4rem 0.8rem; /* Adjusted padding */
+        cursor: pointer;
+        border-radius: 20px;
+        transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    .lang-toggle:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: white;
+    }
+    .mode-toggle {
+        background: transparent;
+        border: 2px solid transparent;
+        padding: 0.4rem 0.8rem;
+        font-size: 1.3rem;
+        line-height: 1;
+        color: white;
+        cursor: pointer;
+        border-radius: 20px;
+        transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .mode-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+
+    /* --- Form Container --- */
+    .form-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 15px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+      text-align: center;
+      margin-top: 140px; /* Space from fixed header */
+    }
+
+    .form-container h2 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--bg-color); /* Use background color for input fields */
+      color: var(--text-color);
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(22, 160, 133, 0.2);
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.9em;
+      margin-top: 0.3rem;
+      display: none; /* Hidden by default */
+    }
+
+    .form-group.error input {
+        border-color: var(--error-color);
+    }
+    .form-group.error .error-message {
+        display: block !important; /* FORCED to display */
+    }
+
+    button[type="submit"] {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+      margin-top: 1.5rem;
+    }
+
+    button[type="submit"]:hover {
+      background-color: var(--button-hover);
+    }
+
+    .auth-links {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .auth-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    #response-message {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none; /* Hidden by default */
+    }
+
+    #response-message.success {
+      background-color: rgba(22, 160, 133, 0.1); /* Light primary color */
+      color: var(--primary-color);
+    }
+
+    #response-message.error {
+      background-color: rgba(231, 60, 50, 0.1); /* Light error color */
+      color: var(--error-color);
+    }
+
+    /* --- Responsive adjustments for header --- */
+    @media (max-width: 600px) {
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+            height: auto; /* Allow height to adjust */
+            padding: 0.5rem 1rem;
+        }
+        .logo {
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .controls {
+            justify-content: flex-end;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .logo img {
+            max-height: 60px; /* Changed from 35px to 60px for mobile consistency with index.html */
+        }
+        .lang-toggle, .mode-toggle {
+            padding: 0.3rem 0.6rem;
+            font-size: 1rem;
+        }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+  <a href="index.html">
+    <img src="./logo.png" alt="logo" width="230">
+  </a>
+  <h1 id="site-title" style="display: none;">Farm Rentals</h1>
+</div>
+    <div class="controls">
+      <button class="lang-toggle" onclick="toggleLanguage()">العربية</button>
+      <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">☀️</button>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <h2 id="signup-heading">Sign Up</h2>
+    <form id="signup-form">
+      <div class="form-group" id="fullname-group">
+        <label for="fullname" id="fullname-label">Full Name</label>
+        <input type="text" id="fullname" name="fullname" />
+        <div class="error-message" id="fullname-error"></div>
+      </div>
+
+      <div class="form-group" id="email-group">
+        <label for="email" id="email-label">Email</label>
+        <input type="email" id="email" name="email" />
+        <div class="error-message" id="email-error"></div>
+      </div>
+
+      <div class="form-group" id="password-group">
+        <label for="password" id="password-label">Password</label>
+        <input type="password" id="password" name="password" />
+        <div class="error-message" id="password-error"></div>
+      </div>
+
+      <div class="form-group" id="confirm-password-group">
+        <label for="confirm-password" id="confirm-password-label">Confirm Password</label>
+        <input type="password" id="confirm-password" name="confirm-password" />
+        <div class="error-message" id="confirm-password-error"></div>
+      </div>
+
+      <button type="submit" id="signup-button">Sign Up</button>
+    </form>
+    <div id="response-message" aria-live="polite"></div>
+    <div class="auth-links">
+      <span id="have-account-text">Already have an account?</span>
+      <a href="signin.html" id="signin-link">Sign In</a>
+    </div>
+  </div>
+
+  <script>
+    // --- Translations (Expanded for auth pages) ---
+    const translations = {
+      en: {
+        title: 'Farm Rentals',
+        signupHeading: 'Sign Up',
+        fullnameLabel: 'Full Name',
+        emailLabel: 'Email',
+        passwordLabel: 'Password',
+        confirmPasswordLabel: 'Confirm Password',
+        signupButton: 'Sign Up',
+        haveAccountText: 'Already have an account?',
+        signinLink: 'Sign In',
+        // Validation messages
+        fullnameRequired: 'Full Name is required.',
+        emailRequired: 'Email is required.',
+        emailInvalid: 'Invalid email format.',
+        passwordRequired: 'Password is required.',
+        passwordMinLength: 'Password must be at least 6 characters.',
+        passwordMissingUppercase: 'Password needs at least one capital letter.',
+        passwordMissingLowercase: 'Password needs at least one small letter.',
+        passwordMissingNumber: 'Password needs at least one number.',
+        passwordMissingSymbol: 'Password needs at least one symbol.',
+        passwordMismatch: 'Passwords do not match.',
+        signupSuccess: 'Sign up successful! You can now log in.',
+        signupFailed: 'Sign up failed: User with this email already exists.',
+        button: 'العربية'
+      },
+      ar: {
+        title: 'تأجير المزارع',
+        signupHeading: 'إنشاء حساب',
+        fullnameLabel: 'الاسم الكامل',
+        emailLabel: 'البريد الإلكتروني',
+        passwordLabel: 'كلمة المرور',
+        confirmPasswordLabel: 'تأكيد كلمة المرور',
+        signupButton: 'إنشاء حساب',
+        haveAccountText: 'هل لديك حساب بالفعل؟',
+        signinLink: 'تسجيل الدخول',
+        // Validation messages
+        fullnameRequired: 'الاسم الكامل مطلوب.',
+        emailRequired: 'البريد الإلكتروني مطلوب.',
+        emailInvalid: 'صيغة البريد الإلكتروني غير صحيحة.',
+        passwordRequired: 'كلمة المرور مطلوبة.',
+        passwordMinLength: 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.',
+        passwordMissingUppercase: 'يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل.',
+        passwordMissingLowercase: 'يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل.',
+        passwordMissingNumber: 'يجب أن تحتوي كلمة المرور على رقم واحد على الأقل.',
+        passwordMissingSymbol: 'يجب أن تحتوي كلمة المرور على رمز واحد على الأقل.',
+        passwordMismatch: 'كلمتا المرور غير متطابقتين.',
+        signupSuccess: 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.',
+        signupFailed: 'فشل إنشاء الحساب: يوجد مستخدم بهذا البريد الإلكتروني بالفعل.',
+        button: 'English'
+      }
+    };
+
+    // --- Global State & DOM References ---
+    let currentLang = localStorage.getItem('language') || 'en';
+    let isDark = localStorage.getItem('darkMode') === 'true';
+
+    // Header elements
+    const siteTitleEl = document.getElementById('site-title');
+    const langToggleButton = document.querySelector('.lang-toggle');
+    const modeToggleButton = document.getElementById('mode-icon');
+
+    // Form elements
+    const signupForm = document.getElementById('signup-form');
+    const signupHeading = document.getElementById('signup-heading');
+    const fullnameInput = document.getElementById('fullname');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const signupButton = document.getElementById('signup-button');
+    const responseMessage = document.getElementById('response-message');
+    const haveAccountText = document.getElementById('have-account-text');
+    const signinLink = document.getElementById('signin-link');
+
+    // Form group error elements
+    const fullnameGroup = document.getElementById('fullname-group');
+    const emailGroup = document.getElementById('email-group');
+    const passwordGroup = document.getElementById('password-group');
+    const confirmPasswordGroup = document.getElementById('confirm-password-group');
+
+    const fullnameError = document.getElementById('fullname-error');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+    const confirmPasswordError = document.getElementById('confirm-password-error');
+
+
+    // --- Functions ---
+
+    // Apply dark mode if saved
+    if (isDark) {
+      document.body.classList.add('dark');
+      modeToggleButton.textContent = '🌙';
+    }
+
+    // Applies current language settings to all dynamic text on the page
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+      // Header
+      siteTitleEl.textContent = t.title;
+      langToggleButton.textContent = t.button;
+
+      // Form
+      signupHeading.textContent = t.signupHeading;
+      document.getElementById('fullname-label').textContent = t.fullnameLabel;
+      document.getElementById('email-label').textContent = t.emailLabel;
+      document.getElementById('password-label').textContent = t.passwordLabel;
+      document.getElementById('confirm-password-label').textContent = t.confirmPasswordLabel;
+      signupButton.textContent = t.signupButton;
+      haveAccountText.textContent = t.haveAccountText;
+      signinLink.textContent = t.signinLink;
+      
+      // Clear and re-validate any existing error messages to update their text
+      resetFormErrors(); 
+      // This will ensure current validation messages are updated on language switch
+      validateForm(true); // Pass true to avoid immediate scroll on language switch
+
+      localStorage.setItem('language', currentLang);
+    }
+
+    // Toggle language
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      applyLanguage();
+    }
+
+    // Toggle dark mode
+    function toggleMode() {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      modeToggleButton.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    }
+
+    // --- Form Validation Functions ---
+
+    function showError(element, message, groupElement) {
+        element.textContent = message;
+        groupElement.classList.add('error');
+    }
+
+    function clearError(element, groupElement) {
+        element.textContent = '';
+        groupElement.classList.remove('error');
+    }
+
+    function resetFormErrors() {
+        clearError(fullnameError, fullnameGroup);
+        clearError(emailError, emailGroup);
+        clearError(passwordError, passwordGroup);
+        clearError(confirmPasswordError, confirmPasswordGroup);
+        responseMessage.style.display = 'none';
+        responseMessage.className = '';
+    }
+
+    function validateEmail(email) {
+        const t = translations[currentLang];
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            showError(emailError, t.emailRequired, emailGroup);
+            return false;
+        } else if (!emailRegex.test(email)) {
+            showError(emailError, t.emailInvalid, emailGroup);
+            return false;
+        }
+        clearError(emailError, emailGroup);
+        return true;
+    }
+
+    function validatePassword(password) {
+        const t = translations[currentLang];
+        
+        // Regular expressions for password strength
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        // Symbols: commonly used symbols, adjust as needed. Excludes whitespace.
+        const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password); 
+
+        if (!password) {
+            showError(passwordError, t.passwordRequired, passwordGroup);
+            return false;
+        } else if (password.length < 6) { // At least 6 characters
+            showError(passwordError, t.passwordMinLength, passwordGroup);
+            return false;
+        } else if (!hasUppercase) { // Check for at least one capital letter
+            showError(passwordError, t.passwordMissingUppercase, passwordGroup);
+            return false;
+        } else if (!hasLowercase) { // Check for at least one small letter
+            showError(passwordError, t.passwordMissingLowercase, passwordGroup);
+            return false;
+        } else if (!hasNumber) { // Check for at least one number
+            showError(passwordError, t.passwordMissingNumber, passwordGroup);
+            return false;
+        } else if (!hasSymbol) { // Check for at least one symbol
+            showError(passwordError, t.passwordMissingSymbol, passwordGroup);
+            return false;
+        }
+        
+        // If all checks pass
+        clearError(passwordError, passwordGroup);
+        return true;
+    }
+
+    function validateConfirmPassword(password, confirmPassword) {
+        const t = translations[currentLang];
+        if (!confirmPassword) { // Confirm password is required
+             showError(confirmPasswordError, t.passwordRequired, confirmPasswordGroup);
+             return false;
+        } else if (password !== confirmPassword) {
+            showError(confirmPasswordError, t.passwordMismatch, confirmPasswordGroup);
+            return false;
+        }
+        clearError(confirmPasswordError, confirmPasswordGroup);
+        return true;
+    }
+
+    function validateFullname(fullname) {
+        const t = translations[currentLang];
+        if (!fullname) {
+            showError(fullnameError, t.fullnameRequired, fullnameGroup);
+            return false;
+        }
+        clearError(fullnameError, fullnameGroup);
+        return true;
+    }
+
+    function validateForm(isLanguageSwitch = false) {
+        // Always reset all errors at the start of a validation cycle
+        // This ensures old messages are cleared before new ones are set
+        resetFormErrors(); 
+        
+        let isValid = true; // Flag to track overall form validity
+
+        // Perform each validation. If a validation function returns false,
+        // it means an error was displayed, and we set isValid to false.
+        // The order here determines which error shows first if multiple exist.
+        if (!validateFullname(fullnameInput.value.trim())) {
+            isValid = false;
+        }
+        if (!validateEmail(emailInput.value.trim())) {
+            isValid = false;
+        }
+        
+        // Validate password and then confirm password
+        const passwordValue = passwordInput.value;
+        const confirmPasswordValue = confirmPasswordInput.value;
+
+        // Check password strength first
+        if (!validatePassword(passwordValue)) { // This will show specific errors if it fails
+            isValid = false;
+        }
+        
+        // Validate confirm password. This depends on passwordValue being ready.
+        // It will show its own error if it fails to match or is empty.
+        // We still call it even if passwordValue failed, to display its error.
+        if (!validateConfirmPassword(passwordValue, confirmPasswordValue)) {
+            isValid = false;
+        }
+
+        // Only scroll to the first error if it's not just a language switch
+        // and there are actual errors on the page.
+        if (!isLanguageSwitch && !isValid) {
+            const firstErrorGroup = document.querySelector('.form-group.error');
+            if (firstErrorGroup) {
+                firstErrorGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        return isValid; // Return the overall validity status
+    }
+
+
+    // --- Form Submission Handler ---
+    signupForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      // Only proceed to submission logic if all fields pass current validation
+      if (validateForm()) { 
+        const t = translations[currentLang];
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const fullname = fullnameInput.value.trim();
+
+        // Simulate user registration using Local Storage
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Check if user with this email already exists
+        if (users.some(user => user.email === email)) {
+          responseMessage.textContent = t.signupFailed;
+          responseMessage.classList.add('error');
+          responseMessage.classList.remove('success');
+          responseMessage.style.display = 'block';
+        } else {
+          // Register new user
+          users.push({ fullname, email, password }); // In a real app, hash password!
+          localStorage.setItem('users', JSON.stringify(users));
+
+          responseMessage.textContent = t.signupSuccess;
+          responseMessage.classList.add('success');
+          responseMessage.classList.remove('error');
+          responseMessage.style.display = 'block';
+
+          // Optionally clear form fields after successful signup
+          signupForm.reset(); 
+        }
+      } else {
+        // Form validation failed, errors are already shown by validateForm
+        responseMessage.style.display = 'none'; // Ensure response message is hidden if previous errors occurred
+      }
+    });
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+      applyLanguage(); // Apply initial language and dark mode based on localStorage
+    });
+  </script>
+</body>
+</html>
